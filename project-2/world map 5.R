@@ -1,0 +1,30 @@
+if (!require("ggplot2")) install.packages("ggplot2", dependencies = TRUE) 
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+if (!require("mapdata")) install.packages("mapdata", dependencies = TRUE)
+
+library(ggplot2)              #needs to be done each r session
+library(tidyverse)            #needs to be done each r session
+library(mapdata)  #needs to be done each r session
+
+unicef_indicator_1 <- read.csv("/cloud/project/unicef_indicator_1.csv")
+
+mapdata <- map_data("world") ##ggplot2
+mapdata <- left_join(mapdata, unicef_indicator_1, by="region")
+mapdata <- filter(mapdata, time_period == 2020)
+map1<-ggplot(mapdata, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = obs_value), color = "grey")
+
+map2 <- map1 + scale_fill_gradient(name = "sanitation access (%)", low = "red", high =  "beige", na.value = "grey50")+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank())
+
+# Ajouter un titre au graphique
+map2 <- map2 + ggtitle("Unequal access to sanitation in the world")
+
+# Afficher le graphique avec le titre
+print(map2)
+

@@ -1,0 +1,152 @@
+---
+title: "Quarto Report"
+author: "Perla Colombani"
+format: html
+---
+```{r}
+```
+# Access to sanitation: a health emergency!
+
+<p style="text-align:center;"> ![](unicef.png){width=500} </p>
+
+## A lack of sanitation access in underdeveloped countries 
+
+```{r, message=FALSE, error=FALSE, warning=FALSE}
+#| echo: false
+if (!require("ggplot2")) install.packages("ggplot2", dependencies = TRUE) 
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+if (!require("mapdata")) install.packages("mapdata", dependencies = TRUE)
+
+library(ggplot2)              #needs to be done each r session
+library(tidyverse)            #needs to be done each r session
+library(mapdata)  #needs to be done each r session
+
+unicef_indicator_1 <- read.csv("/cloud/project/unicef_indicator_1.csv")
+
+mapdata <- map_data("world") ##ggplot2
+mapdata <- left_join(mapdata, unicef_indicator_1, by="region")
+mapdata <- filter(mapdata, time_period == 2020)
+map1<-ggplot(mapdata, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = obs_value), color = "grey")
+
+# Ajouter une nouvelle couche pour les pays sans données
+map1 <- ggplot() +
+  geom_polygon(data = mapdata, aes(x = long, y = lat, group = group, fill = obs_value), color = "grey") +
+  geom_polygon(data = filter(mapdata, is.na(obs_value)), aes(x = long, y = lat, group = group), 
+               fill = "grey", color = "grey")  # Ajouter les pays sans données en blanc
+
+map2 <- map1 + scale_fill_gradient(name = "sanitation access (%)", low = "red", high =  "beige", na.value = "grey50")+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        rect = element_blank())
+
+# Ajouter un titre au graphique
+map2 <- map2 + ggtitle("Proportion of population using advanced sanitation facilities")
+
+# Afficher le graphique avec le titre
+print(map2)
+```
+
+<p style="text-align:center;">**The sanitation challenge**:</p>
+
+<p style="text-align:center;"> ![](drinking.jpeg){width=400} </p>
+
+<p style="text-align:center;text-align:justify;"> 
+- Worldwide, 844 million people lack even a basic source of drinking water and 2.3 billion do not have access to basic sanitation facilities like latrines.
+- About 892 million people worldwide still practice open defecation, leaving communities exposed to water- and sanitation-related diseases.</p>
+
+## A sanitation access that tends to stagnate in recent years
+
+```{r, message=FALSE, error=FALSE, warning=FALSE}
+#| echo: false
+
+install.packages("ggplot2") # To create the bar chart
+
+library(ggplot2)
+
+my_data <- read.csv("/cloud/project/unicef_indicator_1.csv")
+
+# Create the bar chart
+my_chart <- ggplot(my_data, aes(x = time_period, y = obs_value, fill =region)) +
+  geom_bar(stat = "identity", fill = "bisque1") +  # Customize the appearance of the bars
+  labs(title = "Evolution of advanced sanitation facilities access over time", x = "Years", y = "Sanitation access") +  # Customize titles and axis labels
+  theme_minimal() # Customize the overall theme of the chart
+
+# Display the chart
+print(my_chart)
+
+```
+
+## A sanitation access that has nonetheless improved
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, results='hide'}
+#| echo: false
+install.packages("ggplot2")
+
+# Load necessary libraries
+library(ggplot2)
+
+# Load data from the CSV file
+data <-  read.csv("/cloud/project/unicef_indicator_1.csv")
+
+# Create a time-series chart
+unicef_graph <- ts(unicef_indicator_1$obs_value, start = c(2000), end = c(2020), frequency = 1)
+
+plot(unicef_graph, type = "l", xlab = "Years", ylab = "Proportion of sanitation access(%) ", 
+     main = "Sanitation Access over time")
+
+# Show the chart
+print(unicef_graph)
+```
+
+<p style="text-align:center;"> ![](goal.png){width=300} </p>
+
+<p style="text-align:center;text-align:justify;"> UNICEF’s construction initiatives directly support Sustainable Development Goal 6, working towards ensuring that all children have access to safe and clean drinking water and sanitation facilities.</p>
+
+## A poorly distirbuted sanitation access 
+
+```{r, message=FALSE, error=FALSE, warning=FALSE}
+#| echo: false
+install.packages("ggplot2")
+
+# Load necessary libraries
+library(ggplot2)
+
+# Load data
+my_data <- read.csv("/cloud/project/unicef_indicator_1.csv")
+
+# Create the scatterplot with linear regression line
+my_chart <- ggplot(my_data, aes(x = time_period, y = obs_value)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Sanitation access distribution", x = "Years", y = "Sanitation access (%)") +
+  theme_minimal()
+
+# Show the chart
+print(my_chart)
+```
+
+
+<p style="text-align:center;text-align:justify;"> **Our mission:** UNICEF works to give children and their communities access to basic toilets, to encourage their use and to separate human waste from contact with people. One important area of work for sanitation is to end the practice of open defecation and ensure supply of safe water to eliminate preventable diseases. 
+
+<p style="text-align:center;"> ![](wash.png){width=300} </p>
+
+**The primary ways we work:**
+
++ Clean drinking water: Improving access through solutions to drill wells, pump and transport drinking water, as well as supplying appropriate water treatment options in emergency situations. 
+
++ Accessible sanitation facilities: Improving the availability, safety and accessibility of latrines for children, girls and women, as well as the elderly and persons with disabilities.  
+
++ Good hygiene practices: Promoting good hygiene as a cost-effective health intervention to reduce the disease burdens on communities.</p>
+ 
+<p style="text-align:center;">**Together, we can build a better future for every child** </p>
+ 
+<p style="text-align:center;"> [TAKE ACTION](https://www.unicef.org/un-water-conference-2023)</p>
+
+*For more information, you can check our video:*
+{{< video https://youtu.be/fEQ0pDMN3ow >}}
+
+
